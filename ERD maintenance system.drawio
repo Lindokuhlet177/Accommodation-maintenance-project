@@ -1,0 +1,52 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="XUUMH2OgTJUwFrtnJRSg">
+    <mxGraphModel dx="1354" dy="930" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="hNlLgNM488d3P6_i0m8V-69" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="Accomodation" vertex="1">
+          <mxGeometry height="150" width="200" x="230" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="hNlLgNM488d3P6_i0m8V-70" parent="hNlLgNM488d3P6_i0m8V-69" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="AccommodationID&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;PK&lt;/span&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="190" x="5" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hNlLgNM488d3P6_i0m8V-71" parent="hNlLgNM488d3P6_i0m8V-69" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="Name&amp;nbsp;" vertex="1">
+          <mxGeometry height="30" width="190" x="5" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hNlLgNM488d3P6_i0m8V-74" parent="hNlLgNM488d3P6_i0m8V-69" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="Address" vertex="1">
+          <mxGeometry height="30" width="190" x="5" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="hNlLgNM488d3P6_i0m8V-76" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="Room" vertex="1">
+          <mxGeometry height="150" width="200" x="230" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="hNlLgNM488d3P6_i0m8V-77" parent="hNlLgNM488d3P6_i0m8V-76" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="RoomID&amp;nbsp;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;PK&lt;/span&gt;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="190" x="5" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hNlLgNM488d3P6_i0m8V-78" parent="hNlLgNM488d3P6_i0m8V-76" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="RoomNumber" vertex="1">
+          <mxGeometry height="30" width="190" x="5" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hNlLgNM488d3P6_i0m8V-79" parent="hNlLgNM488d3P6_i0m8V-76" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="AccommodationID&amp;nbsp;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;FK&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="190" x="5" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="hNlLgNM488d3P6_i0m8V-80" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="Staff" vertex="1">
+          <mxGeometry height="240" width="220" x="690" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="hNlLgNM488d3P6_i0m8V-81" parent="hNlLgNM488d3P6_i0m8V-80" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="StaffID&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;PK,FK&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="190" x="5" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hNlLgNM488d3P6_i0m8V-82" parent="hNlLgNM488d3P6_i0m8V-80" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="Name&amp;nbsp;" vertex="1">
+          <mxGeometry height="30" width="190" x="5" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hNlLgNM488d3P6_i0m8V-83" parent="hNlLgNM488d3P6_i0m8V-80" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="Email&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;UK&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="190" x="5" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="hNlLgNM488d3P6_i0m8V-84" parent="hNlLgNM488d3P6_i0m8V-80" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="Role" vertex="1">
+          <mxGeometry height="30" width="190" x="5" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="hNlLgNM488d3P6_i0m8V-86" parent="hNlLgNM488d3P6_i0m8V-80" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="AccommodationID&amp;nbsp;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;FK&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="190" x="5" y="200" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
