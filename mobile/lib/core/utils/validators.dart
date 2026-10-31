@@ -1,5 +1,5 @@
-/// Form rules shared by Login, Sign up and Edit Profile.
-/// Each returns an error message, or null if the value is fine.
+// Form rules shared by Login, Sign up and Edit Profile.
+// Each returns an error message, or null if the value is fine.
 class Validators {
   Validators._();
 
