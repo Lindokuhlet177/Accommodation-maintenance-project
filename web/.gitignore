@@ -1,0 +1,8 @@
+# Build output and Visual Studio settings
+bin/
+obj/
+.vs/
+*.user
+
+# Real settings with the Supabase key (use appsettings.example.json)
+appsettings.json

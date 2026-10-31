@@ -1,0 +1,105 @@
+﻿@model TenantListViewModel
+
+<div class="card">
+    <form method="get" asp-action="Index" class="toolbar">
+        <div class="search-box">
+            <i class="bi bi-search"></i>
+            <input type="search" name="search" value="@Model.Search" placeholder="Search by name or student Nr"
+                   autocomplete="off" />
+        </div>
+
+        <select name="accommodation" class="filter-select" onchange="this.form.room.value=''; this.form.submit()">
+            <option value="all" selected="@(Model.ShowingAll)">All Accommodation</option>
+            @foreach (var a in Model.Accommodations)
+            {
+                <option value="@a.Id" selected="@(Model.Accommodation == a.Id.ToString())">@a.Name</option>
+            }
+        </select>
+
+        <select name="room" class="filter-select" onchange="this.form.submit()">
+            <option value="">All Rooms</option>
+            @foreach (var r in Model.Rooms)
+            {
+                var label = Model.ShowingAll && Model.AccommodationNames.TryGetValue(r.AccommodationId, out var n)
+                ? $"{r.RoomNumber} · {n}" : r.RoomNumber;
+                <option value="@r.Id" selected="@(Model.Room == r.Id)">@label</option>
+            }
+        </select>
+        @{
+            var waitingCaretakers = ViewData["PendingCaretakers"] as int? ?? 0;
+        }
+        <a asp-action="Caretakers" class="btn btn-outline toolbar-button">
+            Caretakers
+            @if (waitingCaretakers > 0)
+            {
+                <span class="count-badge">@waitingCaretakers</span>
+            }
+        </a>
+
+        @{
+
+            var pendingCount = ViewData["PendingCount"] as int? ?? 0;
+        }
+        <a asp-action="Registrations" class="btn btn-outline toolbar-button">
+            Registration requests
+            @if (pendingCount > 0)
+            {
+                <span class="count-badge">@pendingCount</span>
+            }
+        </a>
+        <a asp-action="Import" class="btn btn-outline toolbar-button"><i class="bi bi-upload"></i> Import list</a>
+        <a asp-action="Create" class="btn btn-primary toolbar-button">+ Add Tenants</a>
+    </form>
+
+    @if (Model.Rows.Count == 0)
+    {
+        <div class="empty">@(Model.Total == 0 ? "No tenants yet" : "No tenants match your search")</div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Student Number</th>
+                        <th>Accommodation</th>
+                        <th>Room</th>
+                        <th>Contact</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model.Rows)
+                    {
+                        <tr>
+                            <td>
+                                <div class="issue">
+                                    <span class="avatar small tenant-avatar">@AppClaims.Initials(t.FullName)</span>
+                                    <strong>@t.FullName</strong>
+                                </div>
+                            </td>
+                            <td>@t.StudentNumber</td>
+                            <td>@(t.Room != null && Model.AccommodationNames.TryGetValue(t.Room.AccommodationId, out var acc) ? acc : "-")</td>
+                            <td>@t.Room?.RoomNumber</td>
+                            <td class="muted">@(t.Email ?? "-")</td>
+                            <td>
+                                @if (t.HasSignedUp)
+                                {
+                                    <span class="chip closed">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="chip completed">Not signed up</span>
+                                }
+                            </td>
+                            <td><a asp-action="Details" asp-route-id="@t.Id" class="chip open">View</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <p class="muted small-text table-count">Showing @Model.Rows.Count of @Model.Total tenants</p>
+    }
+</div>

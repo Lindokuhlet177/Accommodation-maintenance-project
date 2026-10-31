@@ -1,0 +1,264 @@
+﻿@model RequestDetailsViewModel
+@{
+    var r = Model.Request;
+    var reported = Ui.Local(r.DateSubmitted);
+    var tabUrl = (string tab) => Url.Action("Details", new { id = r.Id, tab });
+
+    string TimelineIcon(string kind) => kind switch
+    {
+        "submitted" => "bi-send-fill",
+        "viewed" => "bi-eye-fill",
+        "note" => "bi-chat-left-text-fill",
+        "reopened" => "bi-exclamation-circle-fill",
+        "resolved" => "bi-check2-all",
+        _ => "bi-check-circle-fill"
+    };
+}
+
+<!-- ================= Top: back, reference, pills ================= -->
+<div class="detail-top">
+    <div>
+        <a asp-action="Index" class="back-link"><i class="bi bi-arrow-left"></i> Back to Requests</a>
+        <p class="detail-ref">#@r.Reference</p>
+    </div>
+    <div class="detail-pills">
+        <span class="chip big @RequestStatus.Css(r.Status)">@RequestStatus.Label(r.Status)</span>
+        <span class="chip big @RequestPriority.Css(r.Priority)">@r.Priority</span>
+    </div>
+</div>
+
+<!-- ================= Issue line ================= -->
+<div class="issue-line">
+    <span class="issue-icon big @Ui.CategoryCss(r.Category)"><i class="bi @Ui.CategoryIcon(r.Category)"></i></span>
+    <div>
+        <h2>@r.Title</h2>
+        <p>Reported by @r.StudentName &nbsp;•&nbsp; Room @r.Room?.RoomNumber &nbsp;•&nbsp; @reported.ToString("d MMM yyyy, HH:mm")</p>
+    </div>
+</div>
+
+<!-- ================= 4 info cards ================= -->
+<div class="info-cards">
+    <div class="info-card">
+        <span class="info-icon red"><i class="bi bi-exclamation-circle"></i></span>
+        <div><span class="info-label">Priority</span><span class="chip @RequestPriority.Css(r.Priority)">@r.Priority</span></div>
+    </div>
+    <div class="info-card">
+        <span class="info-icon blue"><i class="bi bi-clock"></i></span>
+        <div><span class="info-label">Status</span><span class="chip @RequestStatus.Css(r.Status)">@RequestStatus.Label(r.Status)</span></div>
+    </div>
+    <div class="info-card">
+        <span class="info-icon grey"><i class="bi bi-door-closed"></i></span>
+        <div>
+            <span class="info-label">Room</span>
+            <strong>@r.Room?.RoomNumber</strong>
+            <span class="info-sub">@r.Room?.FloorText</span>
+        </div>
+    </div>
+    <div class="info-card">
+        <span class="info-icon grey"><i class="bi bi-person"></i></span>
+        <div>
+            <span class="info-label">Resident</span>
+            <strong>@r.StudentName</strong>
+            <span class="info-sub">@(r.Student?.StudentNumber ?? "No student number")</span>
+        </div>
+    </div>
+</div>
+
+<!-- ================= Tabs ================= -->
+<div class="card tab-card">
+    <nav class="tabs">
+        <a href="@tabUrl("details")" class="@(Model.Tab == "details" ? "active" : "")">Details</a>
+        <a href="@tabUrl("updates")" class="@(Model.Tab == "updates" ? "active" : "")">Updates</a>
+        <a href="@tabUrl("attachments")" class="@(Model.Tab == "attachments" ? "active" : "")">
+            Attachments @if (Model.PhotoUrls.Count > 0) {
+            <span class="tab-count">@Model.PhotoUrls.Count</span>
+                        }
+        </a>
+    </nav>
+
+    <div class="tab-body">
+        @if (Model.Tab == "details")
+        {
+            <!-- ---------- DETAILS ---------- -->
+            <div class="details-grid">
+                <div>
+                    <div class="field"><span class="field-label">Issue Description</span><p>@r.Description</p></div>
+                    <div class="field"><span class="field-label">Category</span><p>@r.Category</p></div>
+                    <div class="field"><span class="field-label">Date Reported</span><p>@reported.ToString("d MMM yyyy, HH:mm")</p></div>
+                    <div class="field"><span class="field-label">Last Updated</span><p>@Ui.Local(Model.LastUpdated).ToString("d MMM yyyy, HH:mm")</p></div>
+                </div>
+                <div>
+                    <span class="field-label">Proof Photo</span>
+                    @if (Model.PhotoUrls.Count > 0)
+                    {
+                        <a href="@Model.PhotoUrls[0]" target="_blank" rel="noopener" class="proof-photo">
+                            <img src="@Model.PhotoUrls[0]" alt="Photo of the issue" />
+                        </a>
+                        @if (Model.PhotoUrls.Count > 1)
+                        {
+                            <a href="@tabUrl("attachments")" class="link-blue small-text">+@(Model.PhotoUrls.Count - 1) more photo(s)</a>
+                        }
+                    }
+                    else
+                    {
+                        <div class="no-photo"><i class="bi bi-camera"></i><span>No photo</span></div>
+                    }
+                </div>
+            </div>
+
+            <h3 class="sub-title">Timeline</h3>
+            <ol class="timeline">
+                @foreach (var item in Model.Timeline)
+                {
+                    <li class="timeline-item">
+                        <span class="timeline-icon @item.Kind"><i class="bi @TimelineIcon(item.Kind)"></i></span>
+                        <div>
+                            <strong>@item.Title</strong>
+                            <span class="muted small-text">@item.When.ToString("d MMM yyyy, HH:mm")</span>
+                            @if (!string.IsNullOrWhiteSpace(item.Text))
+                            {
+                                <p>@item.Text</p>
+                            }
+                        </div>
+                    </li>
+                }
+            </ol>
+
+            <div class="next-step">
+                <i class="bi bi-info-circle"></i>
+                <div><strong>Next step</strong><p>@Model.NextStep</p></div>
+            </div>
+        }
+        else if (Model.Tab == "updates")
+        {
+            <!-- ---------- UPDATES ---------- -->
+            <div class="updates-grid">
+                <div class="update-panel">
+                    @if (!Model.CanUpdate)
+                    {
+                        <div class="next-step">
+                            <i class="bi bi-check2-all"></i>
+                            <div>
+                                <strong>Resolved</strong>
+                                <p>
+                                    The student confirmed this problem is fixed, so it can no longer be updated.
+                                    If it comes back, the student can report it again in the app.
+                                </p>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <h3 class="card-title">Update request</h3>
+                        <p class="card-subtitle">Change priority and status, then record what has been done.</p>
+
+                        <form asp-action="Update" asp-route-id="@r.Id" method="post" id="update-form">
+                            <span class="form-label">Request status</span>
+                            <div class="status-options">
+                                @foreach (var s in RequestStatus.StaffChoices)
+                                {
+                                    <label class="status-option">
+                                        <input type="radio" name="Form.Status" value="@s"
+                                               checked="@(Model.Form.Status == s)"
+                                               data-label="@RequestStatus.Label(s)" data-css="@RequestStatus.Css(s)" />
+                                        <span>
+                                            <strong>@RequestStatus.Label(s)</strong>
+                                            <small>@RequestDetailsViewModel.StatusHint(s)</small>
+                                        </span>
+                                    </label>
+                                }
+                            </div>
+
+                            <label for="priority" class="form-label">Priority</label>
+                            <select id="priority" name="Form.Priority" class="form-input">
+                                @foreach (var p in RequestPriority.All)
+                                {
+                                    <option value="@p" selected="@(Model.Form.Priority == p)">@p</option>
+                                }
+                            </select>
+
+                            <label asp-for="Form.Note" class="form-label">Maintenance update / notes</label>
+                            <textarea asp-for="Form.Note" class="form-input" maxlength="500"
+                                      placeholder="Example: Contacted a plumber. Repair visit is being arranged for tomorrow."></textarea>
+                            <span class="muted small-text">The student sees this note in the app.</span>
+                            <span asp-validation-for="Form.Note" class="field-error"></span>
+
+                            <div class="preview">
+                                <strong>Preview of changes</strong>
+                                <span class="preview-items">
+                                    Priority <span id="preview-priority" class="chip @RequestPriority.Css(Model.Form.Priority)">@Model.Form.Priority</span>
+                                    Status <span id="preview-status" class="chip @RequestStatus.Css(Model.Form.Status)">@RequestStatus.Label(Model.Form.Status)</span>
+                                </span>
+                            </div>
+
+                            <div class="form-actions">
+                                <a asp-action="Index" class="back-link"><i class="bi bi-arrow-left"></i> Back to Requests</a>
+                                <div class="form-actions-right">
+                                    @if (r.Status != RequestStatus.Completed)
+                                    {
+                                        <button type="submit" name="Form.QuickStatus" value="@RequestStatus.Completed"
+                                                class="btn btn-success-outline">
+                                            <i class="bi bi-check2"></i> Mark as Completed
+                                        </button>
+                                    }
+                                    <button type="submit" class="btn btn-primary"><i class="bi bi-floppy"></i> Save Changes</button>
+                                </div>
+                            </div>
+                        </form>
+                    }
+                </div>
+
+                <aside class="student-panel">
+                    <h3 class="card-title">Student and accommodation</h3>
+                    <div class="student-head">
+                        <span class="avatar soft">@AppClaims.Initials(r.StudentName)</span>
+                        <div><strong>@r.StudentName</strong><span class="muted small-text">Student</span></div>
+                    </div>
+                    <div class="field"><span class="field-label">Student number</span><p>@(r.Student?.StudentNumber ?? "-")</p></div>
+                    <div class="field"><span class="field-label">Email</span><p>@(r.Student?.Email ?? "-")</p></div>
+                    <div class="field"><span class="field-label">Phone</span><p>@(r.Student?.Phone ?? "-")</p></div>
+                    <div class="field"><span class="field-label">Property</span><p>@Model.AccommodationName</p></div>
+                    <div class="field"><span class="field-label">Room</span><p>@r.Room?.RoomNumber · @r.Room?.FloorText</p></div>
+                    <p class="locked-note"><i class="bi bi-lock"></i> Pulled from linked student, accommodation and room records. Not edited here.</p>
+                </aside>
+            </div>
+        }
+        else
+        {
+            <!-- ---------- ATTACHMENTS ---------- -->
+            @if (Model.PhotoUrls.Count == 0)
+            {
+                <div class="empty">No photos were attached</div>
+            }
+            else
+            {
+                <div class="photo-grid">
+                    @for (var i = 0; i < Model.PhotoUrls.Count; i++)
+                    {
+                        <a href="@Model.PhotoUrls[i]" target="_blank" rel="noopener">
+                            <img src="@Model.PhotoUrls[i]" alt="Attachment @(i + 1)" loading="lazy" />
+                        </a>
+                    }
+                </div>
+                <p class="muted small-text">Photo links expire after one hour. Reload the page for new ones.</p>
+            }
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Live "Preview of changes" on the Updates tab
+        $('#update-form input[name="Form.Status"]').on('change', function () {
+            $('#preview-status').attr('class', 'chip ' + $(this).data('css')).text($(this).data('label'));
+        });
+        $('#priority').on('change', function () {
+            var p = $(this).val();
+            $('#preview-priority').attr('class', 'chip ' + p.toLowerCase()).text(p);
+        });
+        // Stop double submits
+        $('#update-form').on('submit', function () {
+            $(this).find('button[type=submit]').prop('disabled', true);
+        });
+    </script>
+}

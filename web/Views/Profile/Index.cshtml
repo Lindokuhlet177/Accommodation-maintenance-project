@@ -1,0 +1,69 @@
+﻿@model ProfilePageViewModel
+@{
+    var shell = ViewData["Shell"] as ShellModel ?? new ShellModel();
+}
+
+<div class="profile-grid">
+
+    <!-- ================= Photo ================= -->
+    <div class="card profile-photo-card">
+        @if (Model.AvatarUrl != null)
+        {
+            <img src="@Model.AvatarUrl" alt="Your photo" class="avatar huge photo" />
+        }
+        else
+        {
+            <span class="avatar huge">@shell.Initials</span>
+        }
+        <h3 class="card-title" style="margin-top:14px">@Model.Staff.Name</h3>
+        <p class="card-subtitle">@Model.Staff.Role</p>
+
+        <form asp-action="Photo" method="post" enctype="multipart/form-data" class="photo-form">
+            <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" required class="form-input" />
+            <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-camera"></i> Upload photo</button>
+        </form>
+        <p class="muted small-text">JPG, PNG or WebP, up to 2 MB.</p>
+
+        @if (Model.AvatarUrl != null)
+        {
+            <form asp-action="RemovePhoto" method="post" onsubmit="return confirm('Remove your photo?');">
+                <button type="submit" class="btn btn-danger-outline btn-block">Remove photo</button>
+            </form>
+        }
+    </div>
+
+    <!-- ================= Details ================= -->
+    <div class="card">
+        <h3 class="card-title">My details</h3>
+        <p class="card-subtitle">Your name is shown to students on their request updates.</p>
+
+        <form asp-action="Update" method="post">
+            <label asp-for="Form.Name" class="form-label"></label>
+            <input asp-for="Form.Name" class="form-input" />
+            <span asp-validation-for="Form.Name" class="field-error"></span>
+
+            <label asp-for="Form.Phone" class="form-label"></label>
+            <input asp-for="Form.Phone" class="form-input" placeholder="e.g. 082 123 4567" />
+            <span asp-validation-for="Form.Phone" class="field-error"></span>
+
+            <div class="locked-list">
+                <div><i class="bi bi-lock"></i><span>Email</span><strong>@Model.Staff.Email</strong></div>
+                <div><i class="bi bi-lock"></i><span>Role</span><strong>@Model.Staff.Role</strong></div>
+                <div><i class="bi bi-lock"></i><span>Building</span><strong>@Model.BuildingText</strong></div>
+            </div>
+            @if (Model.Staff.Role == "Caretaker")
+            {
+                <p class="muted small-text">Your role and building are set by the landlord.</p>
+            }
+
+            <div class="form-actions">
+                <span></span>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

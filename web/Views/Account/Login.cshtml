@@ -1,0 +1,73 @@
+﻿@model LoginViewModel
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Sign in";
+}
+
+<div class="auth-page">
+    <!-- Navy strip with the logo -->
+    <aside class="auth-strip">
+        <img src="~/images/logo.png" alt="StudentStayFix" class="auth-logo" />
+    </aside>
+
+    <!-- Photo background with the sign-in card -->
+    <main class="auth-main">
+        <div class="auth-card">
+            <p class="auth-eyebrow">WELCOME BACK!</p>
+            <h1 class="auth-title">Log into your Account</h1>
+            <p class="auth-subtitle">Access your accommodation details and manage maintenance requests</p>
+
+            @if (TempData["Success"] is string success)
+            {
+                <div class="auth-alert success">@success</div>
+            }
+
+            <form asp-action="Login" method="post" id="login-form">
+                <input type="hidden" asp-for="ReturnUrl" />
+
+                <!-- Errors from the controller, e.g. "Incorrect email or password." -->
+                <div asp-validation-summary="ModelOnly" class="auth-alert error"></div>
+
+                <label asp-for="Role" class="auth-label"></label>
+                <select asp-for="Role" class="auth-input">
+                    <option value="">Select your role</option>
+                    <option value="Landlord">Landlord</option>
+                    <option value="Caretaker">Caretaker</option>
+                </select>
+                <span asp-validation-for="Role" class="auth-field-error"></span>
+
+                <label asp-for="Email" class="auth-label">Email</label>
+                <input asp-for="Email" class="auth-input" placeholder="Enter your email"
+                       autocomplete="username" />
+                <span asp-validation-for="Email" class="auth-field-error"></span>
+
+                <label asp-for="Password" class="auth-label">Password</label>
+                <input asp-for="Password" class="auth-input" placeholder="Enter your password"
+                       autocomplete="current-password" />
+                <span asp-validation-for="Password" class="auth-field-error"></span>
+
+                <div class="auth-row-right">
+                    <a asp-action="ForgotPassword" class="auth-link">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="auth-button" id="login-button">Sign In</button>
+            </form>
+
+            <p class="auth-footer">
+                Caretaker without an account? <a asp-action="Register" class="auth-link">Register here</a>
+            </p>
+        </div>
+    </main>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Stop double clicks: disable the button once a valid form is sent
+        $('#login-form').on('submit', function () {
+            if ($(this).valid()) {
+                $('#login-button').prop('disabled', true).text('Signing in…');
+            }
+        });
+    </script>
+}

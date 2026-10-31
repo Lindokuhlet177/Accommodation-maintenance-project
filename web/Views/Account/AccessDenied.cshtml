@@ -1,0 +1,14 @@
+﻿@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Access denied";
+}
+<div class="auth-page">
+    <aside class="auth-strip"><img src="~/images/logo.png" alt="StudentStayFix" class="auth-logo" /></aside>
+    <main class="auth-main">
+        <div class="auth-card">
+            <h1 class="auth-title">Access denied</h1>
+            <p class="auth-subtitle">You don't have permission to open this page.</p>
+            <a asp-controller="Dashboard" asp-action="Index" class="auth-button as-link">Back to Overview</a>
+        </div>
+    </main>
+</div>

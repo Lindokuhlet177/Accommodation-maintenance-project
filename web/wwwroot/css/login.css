@@ -1,0 +1,223 @@
+﻿/* ===== StudentStayFix: sign-in pages (Login, Register, Forgot password) ===== */
+:root {
+    --navy: #021C54;
+    --navy-hover: #0A2A70;
+    --text-muted: #3D4A6B;
+    --card: rgba(217, 217, 217, 0.96);
+    --danger: #B71C1C;
+    --danger-bg: #FDE2E2;
+    --success: #1B5E20;
+    --success-bg: #DFF5E3;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    color: var(--navy);
+}
+
+/* Layout: navy strip on the left, photo on the right */
+.auth-page {
+    display: flex;
+    min-height: 100vh;
+}
+
+.auth-strip {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.auth-logo {
+    width: 100%;
+    max-width: 180px;
+}
+
+.auth-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    background: var(--navy) url('/images/login-bg.png') center / cover no-repeat;
+}
+
+/* The grey card */
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--card);
+    border-radius: 22px;
+    padding: 36px 40px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.auth-eyebrow {
+    margin: 0 0 6px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+}
+
+.auth-title {
+    margin: 0 0 10px;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.auth-subtitle {
+    margin: 0 0 24px;
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* Form fields */
+.auth-label {
+    display: block;
+    margin: 16px 0 6px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 12px 14px;
+    font: inherit;
+    font-size: 14px;
+    color: var(--navy);
+    background: #ECECEC;
+    border: 1.5px solid #9AA0AA;
+    border-radius: 10px;
+}
+
+    .auth-input:focus {
+        outline: none;
+        border-color: var(--navy);
+        background: #fff;
+    }
+
+    .auth-input.input-validation-error {
+        border-color: var(--danger);
+    }
+
+.auth-field-error {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--danger);
+}
+
+.auth-row-right {
+    margin-top: 10px;
+    text-align: right;
+}
+
+.auth-link {
+    color: var(--navy);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+    .auth-link:hover {
+        text-decoration: underline;
+    }
+
+/* Navy button (also used as a link) */
+.auth-button {
+    display: block;
+    width: 60%;
+    margin: 28px auto 0;
+    padding: 13px;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    background: var(--navy);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+    .auth-button:hover {
+        background: var(--navy-hover);
+    }
+
+    .auth-button:disabled {
+        opacity: 0.7;
+        cursor: wait;
+    }
+
+/* Messages */
+.auth-alert {
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    font-size: 13px;
+    border-radius: 10px;
+}
+
+    .auth-alert.error {
+        color: var(--danger);
+        background: var(--danger-bg);
+    }
+
+    .auth-alert.success {
+        color: var(--success);
+        background: var(--success-bg);
+    }
+
+    .auth-alert ul {
+        margin: 0;
+        padding-left: 18px;
+    }
+
+.validation-summary-valid {
+    display: none;
+}
+/* hide the error box when there are no errors */
+
+.auth-footer {
+    margin: 18px 0 0;
+    font-size: 13px;
+    text-align: center;
+}
+
+/* Small screens: logo strip on top */
+@media (max-width: 760px) {
+    .auth-page {
+        flex-direction: column;
+    }
+
+    .auth-strip {
+        width: auto;
+        padding: 16px;
+    }
+
+    .auth-logo {
+        max-width: 140px;
+    }
+
+    .auth-card {
+        padding: 28px 22px;
+    }
+}
+/* Dropdowns (role, accommodation) */
+select.auth-input {
+    appearance: none;
+    cursor: pointer;
+    padding-right: 40px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23021C54' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+}

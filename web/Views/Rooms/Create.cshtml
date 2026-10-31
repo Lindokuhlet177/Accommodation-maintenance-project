@@ -1,0 +1,40 @@
+﻿@model RoomForm
+
+<div class="card form-card">
+    <a asp-action="Index" class="back-link"><i class="bi bi-arrow-left"></i> Back to Rooms</a>
+    <h2 class="card-title" style="margin-top:12px">Add a room</h2>
+    <p class="card-subtitle">The room is added to @((ViewData["Shell"] as ShellModel)?.Current?.Name).</p>
+
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert error"></div>
+
+        <label asp-for="RoomNumber" class="form-label"></label>
+        <input asp-for="RoomNumber" class="form-input" placeholder="e.g. 2A" />
+        <span asp-validation-for="RoomNumber" class="field-error"></span>
+
+        <div class="form-row">
+            <div>
+                <label asp-for="Floor" class="form-label"></label>
+                <input asp-for="Floor" type="number" min="0" max="50" class="form-input" />
+                <span asp-validation-for="Floor" class="field-error"></span>
+            </div>
+            <div>
+                <label asp-for="RoomType" class="form-label"></label>
+                <select asp-for="RoomType" class="form-input">
+                    <option value="Single">Single (1 student)</option>
+                    <option value="Double">Double (2 students)</option>
+                </select>
+                <span asp-validation-for="RoomType" class="field-error"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a asp-action="Index" class="btn btn-outline-grey" style="width:auto">Cancel</a>
+            <button type="submit" class="btn btn-primary">Add Room</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,14 @@
+﻿@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Error";
+}
+<div class="auth-page">
+    <aside class="auth-strip"><img src="~/images/logo.png" alt="StudentStayFix" class="auth-logo" /></aside>
+    <main class="auth-main">
+        <div class="auth-card">
+            <h1 class="auth-title">Something went wrong</h1>
+            <p class="auth-subtitle">Please try again. If the problem continues, contact support.</p>
+            <a asp-controller="Account" asp-action="Login" class="auth-button as-link">Back to Sign In</a>
+        </div>
+    </main>
+</div>

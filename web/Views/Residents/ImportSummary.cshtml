@@ -1,0 +1,49 @@
+﻿@model ImportSummaryViewModel
+
+<div class="card">
+    <h2 class="card-title">Import finished</h2>
+    <p class="card-subtitle">@Model.PropertyName</p>
+
+    <div class="info-cards" style="margin-top:16px">
+        <div class="info-card">
+            <span class="info-icon blue"><i class="bi bi-person-plus"></i></span>
+            <div><span class="info-label">Added</span><strong>@Model.Added</strong></div>
+        </div>
+        <div class="info-card">
+            <span class="info-icon blue"><i class="bi bi-phone"></i></span>
+            <div>
+                <span class="info-label">Linked to an app account</span><strong>@Model.Linked</strong>
+                <span class="info-sub">Had already signed up</span>
+            </div>
+        </div>
+        <div class="info-card">
+            <span class="info-icon red"><i class="bi bi-skip-forward"></i></span>
+            <div><span class="info-label">Skipped</span><strong>@Model.Skipped</strong></div>
+        </div>
+    </div>
+
+    @if (Model.Skipped > 0)
+    {
+        <h3 class="sub-title">Skipped rows</h3>
+        <div class="table-wrap">
+            <table class="table">
+                <thead><tr><th>Row</th><th>Name</th><th>Reason</th></tr></thead>
+                <tbody>
+                    @foreach (var r in Model.Results.Where(r => r.Outcome != "added"))
+                    {
+                        <tr>
+                            <td class="muted">@r.Line</td>
+                            <td>@Model.NamesByLine.GetValueOrDefault(r.Line)</td>
+                            <td><span class="chip urgent">@r.Message</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <div class="form-actions">
+        <a asp-action="Import" class="btn btn-outline" style="width:auto">Import another list</a>
+        <a asp-action="Index" class="btn btn-primary">Go to Tenants</a>
+    </div>
+</div>
