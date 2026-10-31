@@ -33,7 +33,7 @@ class PhotoViewerScreen extends StatelessWidget {
                   ? child
                   : const Center(
                       child: CircularProgressIndicator(color: Colors.white)),
-              errorBuilder: (_, __, ___) => const Icon(Icons.broken_image,
+              errorBuilder: (_, _, _) => const Icon(Icons.broken_image,
                   color: Colors.white54, size: 64),
             ),
           ),

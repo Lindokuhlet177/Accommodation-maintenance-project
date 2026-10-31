@@ -73,7 +73,7 @@ class _SplashScreenState extends State<SplashScreen>
                 'assets/images/logo_full.png',
                 width: 280,
                 // Until the logo is added (Step 1.3), show a text version
-                errorBuilder: (_, __, ___) => const _FallbackLogo(),
+                errorBuilder: (_, _, _) => const _FallbackLogo(),
               ),
             ),
           ),

@@ -34,7 +34,7 @@ class AppDrawer extends StatelessWidget {
                   height: 260,
                   fit: BoxFit.contain,
                   // Until the logo is added, a large icon stands in
-                  errorBuilder: (_, __, ___) => const Icon(
+                  errorBuilder: (_, _, _) => const Icon(
                       Icons.home_repair_service,
                       size: 200,
                       color: AppColors.navy),

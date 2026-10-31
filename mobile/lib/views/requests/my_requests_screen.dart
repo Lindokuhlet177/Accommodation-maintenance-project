@@ -170,7 +170,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(12),
       itemCount: requests.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (_, i) => RequestCard(
         request: requests[i],
         onTap: () => Navigator.pushNamed(

@@ -12,7 +12,7 @@ class AppLogo extends StatelessWidget {
     return Image.asset(
       'assets/images/logo.png',
       height: height,
-      errorBuilder: (_, __, ___) => Column(
+      errorBuilder: (_, _, _) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.home_repair_service,
