@@ -1,0 +1,124 @@
+﻿@model RoomDetailsViewModel
+@{
+    var room = Model.Row.Room;
+}
+
+<!-- ================= Top ================= -->
+<div class="detail-top">
+    <div>
+        <a asp-action="Index" class="back-link"><i class="bi bi-arrow-left"></i> Back to Rooms</a>
+        <p class="detail-ref">@Model.AccommodationName</p>
+    </div>
+    <div class="detail-pills">
+        <span class="chip big @(Model.Row.IsOccupied ? "occupied" : "available")">@Model.Row.StatusText</span>
+    </div>
+</div>
+
+<!-- ================= Info cards ================= -->
+<div class="info-cards" style="margin-top:16px">
+    <div class="info-card">
+        <span class="info-icon blue"><i class="bi bi-layers"></i></span>
+        <div><span class="info-label">Floor</span><strong>@room.FloorText</strong></div>
+    </div>
+    <div class="info-card">
+        <span class="info-icon grey"><i class="bi bi-door-closed"></i></span>
+        <div><span class="info-label">Type</span><strong>@room.RoomType</strong></div>
+    </div>
+    <div class="info-card">
+        <span class="info-icon grey"><i class="bi bi-people"></i></span>
+        <div>
+            <span class="info-label">Beds used</span>
+            <strong>@Model.Row.Tenants.Count of @room.Capacity</strong>
+        </div>
+    </div>
+    <div class="info-card">
+        <span class="info-icon red"><i class="bi bi-tools"></i></span>
+        <div>
+            <span class="info-label">Open requests</span>
+            <strong>@Model.ActiveRequests</strong>
+            <span class="info-sub">@Model.Requests.Count in total</span>
+        </div>
+    </div>
+</div>
+
+<div class="room-grid">
+
+    <!-- ================= Tenants ================= -->
+    <div class="card">
+        <div class="card-head">
+            <div>
+                <h3 class="card-title">Tenants</h3>
+                <p class="card-subtitle">Students with a contract for this room</p>
+            </div>
+            @if (Model.HasSpace)
+            {
+                <a asp-controller="Residents" asp-action="Create" asp-route-roomId="@room.Id" class="link-blue">
+                    + Add tenant
+                </a>
+            }
+        </div>
+
+        @if (Model.Row.Tenants.Count == 0)
+        {
+            <div class="empty">No tenant yet</div>
+        }
+        else
+        {
+            @foreach (var t in Model.Row.Tenants)
+            {
+                <div class="tenant-row">
+                    <span class="avatar soft">@AppClaims.Initials(t.FullName)</span>
+                    <div class="tenant-text">
+                        <strong>@t.FullName</strong>
+                        <span class="muted small-text">@t.StudentNumber @(t.Email == null ? "" : " • " + t.Email)</span>
+                    </div>
+                    @if (t.HasSignedUp)
+                    {
+                        <span class="chip closed">Using the app</span>
+                    }
+                    else
+                    {
+                        <span class="chip completed">Not signed up yet</span>
+                    }
+                </div>
+            }
+        }
+    </div>
+
+    <!-- ================= Maintenance history ================= -->
+    <div class="card">
+        <h3 class="card-title">Maintenance history</h3>
+        <p class="card-subtitle">Every request reported in this room</p>
+
+        @if (Model.Requests.Count == 0)
+        {
+            <div class="empty">No requests for this room</div>
+        }
+        else
+        {
+            <div class="table-wrap" style="margin-top:14px">
+                <table class="table">
+                    <thead>
+                        <tr><th>#</th><th>Issue</th><th>Priority</th><th>Status</th><th>Date</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in Model.Requests)
+                        {
+                            var url = Url.Action("Details", "Requests", new { id = r.Id });
+                            <tr class="clickable" onclick="location.href='@url'">
+                                <td class="muted small-text">@r.Reference</td>
+                                <td>
+                                    <a href="@url" class="cell-main">@r.Title</a>
+                                    <span class="muted small-text">@r.StudentName</span>
+                                </td>
+                                <td><span class="chip @RequestPriority.Css(r.Priority)">@r.Priority</span></td>
+                                <td><span class="chip @RequestStatus.Css(r.Status)">@RequestStatus.Label(r.Status)</span></td>
+                                <td class="muted small-text">@Ui.Local(r.DateSubmitted).ToString("d MMM yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

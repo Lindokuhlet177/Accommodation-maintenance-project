@@ -1,0 +1,228 @@
+﻿@model DashboardViewModel
+@{
+    var shell = ViewData["Shell"] as ShellModel ?? new ShellModel();
+}
+
+@if (!Model.HasProperty)
+{
+    <!-- New landlord with no properties yet -->
+    <div class="card empty-card">
+        <i class="bi bi-buildings empty-icon"></i>
+        <h2 class="card-title">No properties yet</h2>
+        <p class="card-subtitle">Add your first property to start managing maintenance requests.</p>
+        @if (shell.IsLandlord)
+        {
+            <a asp-controller="Property" asp-action="Create" class="btn btn-primary">+ Add property</a>
+        }
+    </div>
+    return;
+}
+
+<div class="overview">
+
+    <!-- ================= LEFT: stats + open requests ================= -->
+    <section>
+        <h2 class="section-title">Property Overview</h2>
+        <p class="section-subtitle">Quick summary of maintenance requests for @shell.Current?.Name</p>
+
+        <div class="stat-row">
+            <a class="stat-card" asp-controller="Requests" asp-action="Index" asp-route-status="Open">
+                <span class="stat-icon blue"><i class="bi bi-clipboard2-check"></i></span>
+                <div>
+                    <strong>@Model.OpenCount</strong>
+                    <span class="stat-label">Open Requests</span>
+                    <span class="stat-hint">@Model.NewSinceYesterday new since yesterday</span>
+                </div>
+                <i class="bi bi-chevron-right stat-arrow"></i>
+            </a>
+
+            <a class="stat-card" asp-controller="Requests" asp-action="Index" asp-route-priority="Urgent">
+                <span class="stat-icon red"><i class="bi bi-exclamation-triangle-fill"></i></span>
+                <div>
+                    <strong>@Model.UrgentCount</strong>
+                    <span class="stat-label">Urgent Requests</span>
+                    <span class="stat-hint">Needs attention now</span>
+                </div>
+                <i class="bi bi-chevron-right stat-arrow"></i>
+            </a>
+
+            <a class="stat-card" asp-controller="Requests" asp-action="Index" asp-route-status="In Progress">
+                <span class="stat-icon green"><i class="bi bi-arrow-repeat"></i></span>
+                <div>
+                    <strong>@Model.InProgressCount</strong>
+                    <span class="stat-label">In Progress</span>
+                    <span class="stat-hint">Currently being resolved</span>
+                </div>
+                <i class="bi bi-chevron-right stat-arrow"></i>
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-head">
+                <div>
+                    <h3 class="card-title">Open Maintenance Requests</h3>
+                    <p class="card-subtitle">View and manage current maintenance requests</p>
+                </div>
+                <a asp-controller="Requests" asp-action="Index" class="link-blue">
+                    View all requests <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+
+            @if (Model.OpenRequests.Count == 0)
+            {
+                <div class="empty">No active requests</div>
+            }
+            else
+            {
+                <div class="table-wrap">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Issue / Description</th>
+                                <th>Student / Room</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Date Submitted</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in Model.OpenRequests)
+                            {
+                                var detailsUrl = Url.Action("Details", "Requests", new { id = r.Id });
+                                <tr class="clickable" onclick="location.href='@detailsUrl'">
+                                    <td>
+                                        <div class="issue">
+                                            <span class="issue-icon @Ui.CategoryCss(r.Category)">
+                                                <i class="bi @Ui.CategoryIcon(r.Category)"></i>
+                                            </span>
+                                            <div>
+                                                <a href="@detailsUrl" class="cell-main">@r.Title</a>
+                                                <span class="muted small-text">@Ui.Shorten(r.Description, 40)</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="cell-main">@r.StudentName</span>
+                                        <span class="muted small-text">Room @r.Room?.RoomNumber</span>
+                                    </td>
+                                    <td><span class="chip @RequestPriority.Css(r.Priority)">@r.Priority</span></td>
+                                    <td><span class="chip @RequestStatus.Css(r.Status)">@RequestStatus.Label(r.Status)</span></td>
+                                    <td class="muted small-text">@Ui.Local(r.DateSubmitted).ToString("d MMM yyyy HH:mm")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- ================= RIGHT: status, priorities, tasks ================= -->
+    <aside class="side-stack">
+
+        <div class="card">
+            <h3 class="card-title">Request Status</h3>
+            <div class="donut-wrap">
+                <div class="donut" style="background: conic-gradient(@Model.DonutGradient)">
+                    <div class="donut-hole">
+                        <strong>@Model.Total</strong>
+                        <span>Total</span>
+                    </div>
+                </div>
+                <ul class="legend">
+                    @foreach (var s in Model.StatusSlices)
+                    {
+                        <li><span class="dot" style="background:@s.Color"></span>@s.Label<strong>@s.Count</strong></li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Priority Breakdown</h3>
+            @foreach (var p in Model.Priorities)
+            {
+                <div class="prio-row">
+                    <div class="prio-top">
+                        <span class="dot @(p.CssClass)-bg"></span>@p.Label<strong>@p.Count</strong>
+                    </div>
+                    <div class="bar">
+                        <span class="bar-fill @(p.CssClass)-bg" style="width:@(p.Percent)%"></span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Upcoming tasks &amp; inspections</h3>
+
+            @if (Model.Tasks.Count == 0)
+            {
+                <p class="card-subtitle" style="margin-top:12px">No upcoming tasks.</p>
+            }
+            else
+            {
+                <div class="task-list">
+                    @foreach (var t in Model.Tasks)
+                    {
+                        var local = Ui.Local(t.EventDate);
+                        <div class="task">
+                            <div class="task-date">
+                                <strong>@local.Day</strong>
+                                <span>@local.ToString("MMM").ToUpper()</span>
+                            </div>
+                            <div class="task-text">
+                                <strong>@t.Title</strong>
+                                <span>@Ui.When(local)@(string.IsNullOrWhiteSpace(t.Details) ? "" : " • " + t.Details)</span>
+                            </div>
+                            @if (Model.CanManageTasks)
+                            {
+                                <form asp-controller="Events" asp-action="Delete" asp-route-id="@t.Id" method="post"
+                                      onsubmit="return confirm('Remove this task?');">
+                                    <button type="submit" class="task-remove" title="Remove task" aria-label="Remove task">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (Model.CanManageTasks)
+            {
+                <details class="add-task">
+                    <summary class="btn btn-outline-grey">+ Add task or inspection</summary>
+
+                    <form asp-controller="Events" asp-action="Create" method="post" class="task-form">
+                        <label asp-for="NewTask.Title" class="form-label">Title</label>
+                        <input asp-for="NewTask.Title" class="form-input" placeholder="e.g. Annual fire alarm inspection" />
+                        <span asp-validation-for="NewTask.Title" class="field-error"></span>
+
+                        <div class="form-row">
+                            <div>
+                                <label asp-for="NewTask.Date" class="form-label">Date</label>
+                                <input asp-for="NewTask.Date" type="date" class="form-input" />
+                                <span asp-validation-for="NewTask.Date" class="field-error"></span>
+                            </div>
+                            <div>
+                                <label asp-for="NewTask.Time" class="form-label">Time</label>
+                                <input asp-for="NewTask.Time" type="time" class="form-input" />
+                                <span asp-validation-for="NewTask.Time" class="field-error"></span>
+                            </div>
+                        </div>
+
+                        <label asp-for="NewTask.Details" class="form-label">Details (optional)</label>
+                        <input asp-for="NewTask.Details" class="form-input" placeholder="e.g. All floors" />
+                        <span asp-validation-for="NewTask.Details" class="field-error"></span>
+
+                        <button type="submit" class="btn btn-primary btn-block">Save task</button>
+                    </form>
+                </details>
+            }
+        </div>
+    </aside>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

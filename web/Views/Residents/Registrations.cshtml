@@ -1,0 +1,77 @@
+﻿@model RegistrationListViewModel
+
+<div class="reg-head">
+    <div>
+        <a asp-action="Index" class="back-link"><i class="bi bi-arrow-left"></i> Back to Tenants</a>
+        <h2 class="section-title" style="margin-top:10px">Student Registration Requests</h2>
+        <p class="section-subtitle">
+            Students who signed up in the app but didn't match a contract. Usually a typo in the student
+            number or surname. Link them to their room, or decline if they don't live here.
+        </p>
+    </div>
+    <span class="pending-pill"><span class="bell-dot-static"></span> @Model.Students.Count pending</span>
+</div>
+
+@if (Model.Students.Count == 0)
+{
+    <div class="card">
+        <div class="empty">No registration requests. Every student who signed up matched a contract.</div>
+    </div>
+}
+else
+{
+    @foreach (var s in Model.Students)
+    {
+        var formId = $"link-{s.Id}";
+        <div class="reg-card">
+            <div class="reg-person">
+                <span class="avatar soft">@AppClaims.Initials(s.FullName)</span>
+                <div>
+                    <strong>@s.FullName</strong>
+                    <span class="muted small-text">@(s.StudentNumber ?? "No student number")</span>
+                </div>
+            </div>
+
+            <div class="reg-field">
+                <span class="info-label">Email</span>
+                <span><i class="bi bi-envelope"></i> @s.Email</span>
+            </div>
+
+            <div class="reg-field">
+                <span class="info-label">Signed up</span>
+                <span><i class="bi bi-clock"></i> @Ui.Ago(s.RegisteredAt)</span>
+            </div>
+
+            <!-- Link to room -->
+            <form asp-action="LinkStudent" method="post" id="@formId" class="reg-link">
+                <input type="hidden" name="studentId" value="@s.Id" />
+                @if (string.IsNullOrWhiteSpace(s.StudentNumber))
+                {
+                    <input type="text" name="studentNumber" class="form-input" placeholder="Student number"
+                           required pattern="[A-Za-z0-9]+" title="Letters and numbers only" />
+                }
+                <select name="roomId" class="form-input" required>
+                    <option value="">Choose room</option>
+                    @foreach (var g in Model.RoomGroups)
+                    {
+                        <optgroup label="@g.PropertyName">
+                            @foreach (var r in g.Rooms)
+                            {
+                                <option value="@r.Room.Id">Room @r.Room.RoomNumber · @r.Room.FloorText</option>
+                            }
+                        </optgroup>
+                    }
+                </select>
+            </form>
+
+            <div class="reg-actions">
+                <form asp-action="DeclineStudent" method="post"
+                      onsubmit="return confirm('Decline @s.FullName? They will not get access to a room.');">
+                    <input type="hidden" name="studentId" value="@s.Id" />
+                    <button type="submit" class="btn btn-danger-outline"><i class="bi bi-x-lg"></i> Decline</button>
+                </form>
+                <button type="submit" form="@formId" class="btn btn-success"><i class="bi bi-check-lg"></i> Link to room</button>
+            </div>
+        </div>
+    }
+}

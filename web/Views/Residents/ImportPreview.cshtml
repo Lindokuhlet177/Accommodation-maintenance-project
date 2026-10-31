@@ -1,0 +1,62 @@
+﻿@model ImportPreviewViewModel
+
+<div class="card">
+    <a asp-action="Import" class="back-link"><i class="bi bi-arrow-left"></i> Upload a different file</a>
+    <h2 class="card-title" style="margin-top:12px">Check the list before importing</h2>
+    <p class="card-subtitle">@Model.FileName → @Model.PropertyName</p>
+
+    <div class="import-counts">
+        <span class="chip closed big">@Model.ReadyCount ready</span>
+        @if (Model.ProblemCount > 0)
+        {
+            <span class="chip urgent big">@Model.ProblemCount with problems (will be skipped)</span>
+        }
+    </div>
+
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr><th>Row</th><th>Name</th><th>Student Number</th><th>Room</th><th>Email</th><th>Phone</th><th>Check</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.Rows)
+                {
+                    <tr class="@(r.IsReady ? "" : "row-problem")">
+                        <td class="muted">@r.Line</td>
+                        <td><strong>@r.FullName</strong></td>
+                        <td>@r.StudentNumber</td>
+                        <td>@r.RoomNumber</td>
+                        <td class="muted">@(r.Email ?? "-")</td>
+                        <td class="muted">@(r.Phone ?? "-")</td>
+                        <td>
+                            @if (r.IsReady)
+                            {
+                                <span class="chip closed">Ready</span>
+                            }
+                            else
+                            {
+                                <span class="chip urgent">@r.Problem</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <form asp-action="ImportConfirm" method="post" class="form-actions" id="confirm-form">
+        <input type="hidden" name="rowsJson" value="@Model.ReadyRowsJson" />
+        <a asp-action="Index" class="btn btn-outline-grey" style="width:auto">Cancel</a>
+        <button type="submit" class="btn btn-primary" disabled="@(Model.ReadyCount == 0)">
+            <i class="bi bi-check2-all"></i> Import @Model.ReadyCount student@(Model.ReadyCount == 1 ? "" : "s")
+        </button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $('#confirm-form').on('submit', function () {
+            $(this).find('button[type=submit]').prop('disabled', true).text('Importing…');
+        });
+    </script>
+}

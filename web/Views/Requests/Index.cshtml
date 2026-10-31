@@ -1,0 +1,147 @@
+﻿@model RequestListViewModel
+
+<!-- ================= Stat cards ================= -->
+<div class="stat-row four">
+    <a class="stat-card" asp-action="Index" asp-route-accommodation="@Model.Accommodation">
+        <span class="stat-icon blue"><i class="bi bi-list-task"></i></span>
+        <div>
+            <strong>@Model.Total</strong>
+            <span class="stat-label">Total Requests</span>
+            <span class="stat-hint">All time</span>
+        </div>
+        <i class="bi bi-chevron-right stat-arrow"></i>
+    </a>
+    <a class="stat-card" asp-action="Index" asp-route-accommodation="@Model.Accommodation" asp-route-priority="Urgent">
+        <span class="stat-icon red"><i class="bi bi-exclamation-triangle-fill"></i></span>
+        <div>
+            <strong>@Model.Urgent</strong>
+            <span class="stat-label">Urgent Requests</span>
+            <span class="stat-hint">Require immediate attention</span>
+        </div>
+        <i class="bi bi-chevron-right stat-arrow"></i>
+    </a>
+    <a class="stat-card" asp-action="Index" asp-route-accommodation="@Model.Accommodation" asp-route-status="In Progress">
+        <span class="stat-icon green"><i class="bi bi-arrow-repeat"></i></span>
+        <div>
+            <strong>@Model.InProgress</strong>
+            <span class="stat-label">In Progress</span>
+            <span class="stat-hint">Currently being resolved</span>
+        </div>
+        <i class="bi bi-chevron-right stat-arrow"></i>
+    </a>
+    <a class="stat-card" asp-action="Index" asp-route-accommodation="@Model.Accommodation" asp-route-status="Closed">
+        <span class="stat-icon green"><i class="bi bi-check2-circle"></i></span>
+        <div>
+            <strong>@Model.Resolved</strong>
+            <span class="stat-label">Resolved</span>
+            <span class="stat-hint">Confirmed fixed by the student</span>
+        </div>
+        <i class="bi bi-chevron-right stat-arrow"></i>
+    </a>
+</div>
+
+<div class="card">
+    <!-- ================= Filters ================= -->
+    <form method="get" asp-action="Index" class="filters" id="filters">
+        <select name="status" class="filter-select" onchange="this.form.submit()">
+            <option value="">All Statuses</option>
+            @foreach (var (value, label) in RequestListViewModel.StatusOptions)
+            {
+                <option value="@value" selected="@(Model.Status == value)">@label</option>
+            }
+        </select>
+
+        <select name="priority" class="filter-select" onchange="this.form.submit()">
+            <option value="">All Priorities</option>
+            @foreach (var p in RequestPriority.All)
+            {
+                <option value="@p" selected="@(Model.Priority == p)">@p</option>
+            }
+        </select>
+
+        @if (Model.ShowAccommodationFilter)
+        {
+            <!-- Changing property clears the room (rooms belong to a property) -->
+            <select name="accommodation" class="filter-select"
+                    onchange="this.form.room.value=''; this.form.submit()">
+                <option value="all" selected="@(Model.ShowingAll)">All Accommodation</option>
+                @foreach (var a in Model.Accommodations)
+                {
+                    <option value="@a.Id" selected="@(Model.Accommodation == a.Id.ToString())">@a.Name</option>
+                }
+            </select>
+        }
+        else
+        {
+            <input type="hidden" name="accommodation" value="@Model.Accommodation" />
+        }
+
+        <select name="room" class="filter-select" onchange="this.form.submit()">
+            <option value="">All Rooms</option>
+            @foreach (var r in Model.Rooms)
+            {
+                var label = Model.ShowingAll && Model.AccommodationNames.TryGetValue(r.AccommodationId, out var accName)
+                ? $"{r.RoomNumber} · {accName}"
+                : r.RoomNumber;
+                <option value="@r.Id" selected="@(Model.Room == r.Id)">@label</option>
+            }
+        </select>
+
+        <a asp-action="Index" class="btn btn-outline">Reset Filters</a>
+        <noscript><button type="submit" class="btn btn-primary">Apply</button></noscript>
+    </form>
+
+    <!-- ================= Table ================= -->
+    @if (Model.Requests.Count == 0)
+    {
+        <div class="empty">@(Model.HasFilters ? "No requests match these filters" : "No requests yet")</div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Issue Title</th>
+                        <th>Student</th>
+                        <th>Room</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Date Submitted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model.Requests)
+                    {
+                        var detailsUrl = Url.Action("Details", "Requests", new { id = r.Id });
+                        <tr class="clickable" onclick="location.href='@detailsUrl'">
+                            <td>
+                                <div class="issue">
+                                    <span class="issue-icon @Ui.CategoryCss(r.Category)">
+                                        <i class="bi @Ui.CategoryIcon(r.Category)"></i>
+                                    </span>
+                                    <span class="muted small-text">@r.Reference</span>
+                                </div>
+                            </td>
+                            <td><a href="@detailsUrl" class="cell-main">@r.Title</a></td>
+                            <td>@r.StudentName</td>
+                            <td>
+                                @r.Room?.RoomNumber
+                                @if (Model.ShowingAll && r.Room != null
+                                                        && Model.AccommodationNames.TryGetValue(r.Room.AccommodationId, out var propName))
+                                {
+                                    <span class="muted small-text">@propName</span>
+                                }
+                            </td>
+                            <td><span class="chip @RequestPriority.Css(r.Priority)">@r.Priority</span></td>
+                            <td><span class="chip @RequestStatus.Css(r.Status)">@RequestStatus.Label(r.Status)</span></td>
+                            <td class="muted small-text">@Ui.Local(r.DateSubmitted).ToString("d MMM yyyy HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <p class="muted small-text table-count">Showing @Model.Requests.Count of @Model.Total requests</p>
+    }
+</div>

@@ -1,0 +1,41 @@
+﻿@model RemovePropertyViewModel
+
+<div class="card form-card">
+    <a asp-controller="Dashboard" asp-action="Index" class="back-link"><i class="bi bi-arrow-left"></i> Back to Overview</a>
+    <h2 class="card-title" style="margin-top:12px">Remove @Model.Property.Name?</h2>
+    <p class="card-subtitle">Use this only for a property that was added by mistake.</p>
+
+    <ul class="remove-checks">
+        <li class="ok"><i class="bi bi-check-circle-fill"></i> @Model.Rooms room(s): empty rooms are removed with the property</li>
+        <li class="@(Model.Tenants == 0 ? "ok" : "blocked")">
+            <i class="bi @(Model.Tenants == 0 ? "bi-check-circle-fill" : "bi-x-circle-fill")"></i>
+            @Model.Tenants tenant(s) @(Model.Tenants == 0 ? "" : ": end their tenancies first")
+        </li>
+        <li class="@(Model.Requests == 0 ? "ok" : "blocked")">
+            <i class="bi @(Model.Requests == 0 ? "bi-check-circle-fill" : "bi-x-circle-fill")"></i>
+            @Model.Requests maintenance request(s) @(Model.Requests == 0 ? "" : ": the history must be kept")
+        </li>
+        <li class="@(Model.Caretakers == 0 ? "ok" : "blocked")">
+            <i class="bi @(Model.Caretakers == 0 ? "bi-check-circle-fill" : "bi-x-circle-fill")"></i>
+            @Model.Caretakers caretaker(s) @(Model.Caretakers == 0 ? "" : ": move them to another property first")
+        </li>
+    </ul>
+
+    @if (Model.CanRemove)
+    {
+        <div class="danger-zone">
+            <strong>This can't be undone</strong>
+            <p>The property, its empty rooms and its upcoming tasks will be removed.</p>
+            <form asp-action="Remove" asp-route-id="@Model.Property.Id" method="post"
+                  onsubmit="return confirm('Remove @Model.Property.Name permanently?');">
+                <button type="submit" class="btn btn-danger-outline"><i class="bi bi-trash"></i> Remove property</button>
+            </form>
+        </div>
+    }
+    else
+    {
+        <div class="alert error" style="margin-top:16px">
+            <i class="bi bi-exclamation-circle-fill"></i> This property is in use, so it can't be removed.
+        </div>
+    }
+</div>

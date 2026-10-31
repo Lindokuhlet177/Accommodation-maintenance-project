@@ -1,0 +1,69 @@
+﻿@model StaffNotificationsViewModel
+@{
+    string Icon(string kind) => kind switch
+    {
+        "new" => "bi-plus-circle-fill",
+        "reopened" => "bi-exclamation-circle-fill",
+        _ => "bi-check2-all"
+    };
+}
+
+<div class="notif-page">
+
+    <!-- Landlord: things waiting for action -->
+    @if (Model.PendingRegistrations > 0)
+    {
+        <a asp-controller="Residents" asp-action="Registrations" class="action-card">
+            <i class="bi bi-person-exclamation"></i>
+            <span>
+                <strong>@Model.PendingRegistrations student@(Model.PendingRegistrations == 1 ? "" : "s")</strong>
+                signed up but didn't match a contract
+            </span>
+            <i class="bi bi-chevron-right"></i>
+        </a>
+    }
+    @if (Model.PendingCaretakers > 0)
+    {
+        <a asp-controller="Residents" asp-action="Caretakers" class="action-card">
+            <i class="bi bi-person-badge"></i>
+            <span>
+                <strong>@Model.PendingCaretakers caretaker@(Model.PendingCaretakers == 1 ? "" : "s")</strong>
+                waiting for approval
+            </span>
+            <i class="bi bi-chevron-right"></i>
+        </a>
+    }
+
+    @if (Model.Items.Count == 0)
+    {
+        <div class="card"><div class="empty">You're all caught up</div></div>
+    }
+    else
+    {
+        foreach (var (heading, items) in new[] { ("New", Model.NewItems), ("Earlier", Model.EarlierItems) })
+        {
+            if (items.Count == 0) { continue; }
+            <h3 class="section-title notif-heading">@heading</h3>
+            foreach (var n in items)
+            {
+                <a asp-controller="Requests" asp-action="Details" asp-route-id="@n.RequestId"
+                   class="notif-card @(n.IsUnread ? "unread" : "")">
+                    <span class="notif-icon @n.Kind"><i class="bi @Icon(n.Kind)"></i></span>
+                    <div class="notif-text">
+                        <strong>@n.Title</strong>
+                        <span>@n.Text</span>
+                        @if (!string.IsNullOrWhiteSpace(n.Comment))
+                        {
+                            <em>"@n.Comment"</em>
+                        }
+                    </div>
+                    <span class="notif-time">@Ui.Ago(n.When)</span>
+                    @if (n.IsUnread)
+                    {
+                        <span class="notif-dot"></span>
+                    }
+                </a>
+            }
+        }
+    }
+</div>

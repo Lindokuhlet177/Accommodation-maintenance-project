@@ -1,0 +1,184 @@
+﻿@{
+    var shell = ViewData["Shell"] as ShellModel ?? new ShellModel();
+    var active = ViewData["Active"] as string ?? "";
+    var heading = ViewData["Heading"] as string ?? ViewData["Title"] as string ?? "";
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - StudentStayFix</title>
+    <link rel="icon" href="~/images/logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/app.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="app">
+
+        <!-- ================= SIDEBAR ================= -->
+        <aside class="sidebar">
+            <a asp-controller="Dashboard" asp-action="Index" class="sidebar-logo">
+                <img src="~/images/logo.png" alt="StudentStayFix" />
+            </a>
+
+            @if (shell.Current != null)
+            {
+                <p class="side-label">Property</p>
+                <div class="property-card">
+                    <strong>@shell.Current.Name</strong>
+                    <span>@shell.Current.Address</span>
+                </div>
+            }
+
+            <p class="side-label">Managed properties</p>
+            <ul class="property-list">
+                @foreach (var p in shell.Properties)
+                {
+                    var isCurrent = p.Id == shell.Current?.Id;
+                    <li>
+                        @if (shell.IsLandlord)
+                        {
+                            <!-- Landlord: click to switch property -->
+                            <form asp-controller="Property" asp-action="Select" method="post">
+                                <input type="hidden" name="id" value="@p.Id" />
+                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                <button type="submit" class="property-item @(isCurrent ? "active" : "")">
+                                    <i class="bi bi-building"></i> @p.Name
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="property-item active"><i class="bi bi-building"></i> @p.Name</span>
+                        }
+                    </li>
+                }
+            </ul>
+            @if (shell.IsLandlord)
+            {
+                <a asp-controller="Property" asp-action="Create" class="add-property">+ Add property</a>
+                @if (shell.Current != null)
+                {
+                    <a asp-controller="Property" asp-action="Remove" class="add-property remove-property">Remove property</a>
+                }
+            }
+
+            <nav class="side-nav">
+                <a asp-controller="Dashboard" asp-action="Index" class="@(active == "Overview" ? "active" : "")">
+                    <i class="bi bi-grid-fill"></i> Overview
+                </a>
+                <a asp-controller="Requests" asp-action="Index" class="@(active == "Requests" ? "active" : "")">
+                    <i class="bi bi-wrench-adjustable"></i> Requests
+                </a>
+                @if (shell.IsLandlord)
+                {
+                    <a asp-controller="Rooms" asp-action="Index" class="@(active == "Rooms" ? "active" : "")">
+                        <i class="bi bi-house-door-fill"></i> Rooms
+                    </a>
+                    <a asp-controller="Residents" asp-action="Index" class="@(active == "Residents" ? "active" : "")">
+                        <i class="bi bi-people-fill"></i> Residents
+                    </a>
+                }
+            </nav>
+
+            <div class="sidebar-user">
+                @if (shell.AvatarUrl != null)
+                {
+                    <img src="@shell.AvatarUrl" alt="" class="avatar small photo" />
+                }
+                else
+                {
+                    <span class="avatar small">@shell.Initials</span>
+                }
+                <div class="sidebar-user-text">
+                    <strong>@shell.UserName</strong>
+                    <span>@shell.RoleName</span>
+                </div>
+                <form asp-controller="Account" asp-action="Logout" method="post">
+                    <button type="submit" class="icon-button" title="Log out" aria-label="Log out">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- ================= MAIN ================= -->
+        <div class="main">
+            <header class="topbar">
+                <div>
+                    <h1 class="page-title">@heading</h1>
+                    <p class="page-subtitle">
+                        @Ui.TodayText
+                        @if (shell.Current != null)
+                        {
+                            <span>&nbsp;•&nbsp; @shell.Current.Name</span>
+                        }
+                    </p>
+                </div>
+
+                <div class="topbar-right">
+                    <a asp-controller="Notifications" asp-action="Index" class="bell" aria-label="Notifications">
+                        <i class="bi bi-bell"></i>
+                        @if (shell.UnreadCount > 0)
+                        {
+                            <span class="bell-count">@(shell.UnreadCount > 9 ? "9+" : shell.UnreadCount.ToString())</span>
+                        }
+                    </a>
+                    <!-- Avatar opens the profile menu (no JavaScript needed) -->
+                    <details class="user-menu">
+                        <summary class="user-chip">
+                            @if (shell.AvatarUrl != null)
+                            {
+                                <img src="@shell.AvatarUrl" alt="" class="avatar photo" />
+                            }
+                            else
+                            {
+                                <span class="avatar">@shell.Initials</span>
+                            }
+                            <div>
+                                <strong>@shell.UserName</strong>
+                                <span>@shell.RoleName</span>
+                            </div>
+                        </summary>
+
+                        <div class="user-menu-panel">
+                            @if (shell.AvatarUrl != null)
+                            {
+                                <img src="@shell.AvatarUrl" alt="" class="avatar big photo" />
+                            }
+                            else
+                            {
+                                <span class="avatar big">@shell.Initials</span>
+                            }
+                            <div class="user-menu-links">
+                                <a asp-controller="Profile" asp-action="Index">Profile</a>
+                                
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </header>
+
+            <main class="content">
+                @if (TempData["Success"] is string success)
+                {
+                    <div class="alert success"><i class="bi bi-check-circle-fill"></i> @success</div>
+                }
+                @if (TempData["Error"] is string error)
+                {
+                    <div class="alert error"><i class="bi bi-exclamation-circle-fill"></i> @error</div>
+                }
+
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

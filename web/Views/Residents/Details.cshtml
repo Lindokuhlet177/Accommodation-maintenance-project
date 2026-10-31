@@ -1,0 +1,138 @@
+﻿@model TenantDetailsViewModel
+@{
+    var t = Model.Tenancy;
+}
+
+<!-- ================= Top ================= -->
+<div class="detail-top">
+    <a asp-action="Index" class="back-link"><i class="bi bi-arrow-left"></i> Back to Tenants</a>
+    <div class="detail-pills">
+        @if (t.HasSignedUp)
+        {
+            <span class="chip big closed">Active</span>
+        }
+        else
+        {
+            <span class="chip big completed">Not signed up</span>
+        }
+    </div>
+</div>
+
+<div class="issue-line">
+    <span class="avatar tenant-avatar">@AppClaims.Initials(t.FullName)</span>
+    <div>
+        <h2>@t.FullName</h2>
+        <p>Student number @t.StudentNumber</p>
+    </div>
+</div>
+
+<!-- ================= Info cards ================= -->
+<div class="info-cards">
+    <div class="info-card">
+        <span class="info-icon blue"><i class="bi bi-door-closed"></i></span>
+        <div>
+            <span class="info-label">Room</span>
+            <strong>@t.Room?.RoomNumber</strong>
+            <span class="info-sub">@t.Room?.FloorText · @t.Room?.RoomType</span>
+        </div>
+    </div>
+    <div class="info-card">
+        <span class="info-icon grey"><i class="bi bi-building"></i></span>
+        <div><span class="info-label">Property</span><strong>@Model.AccommodationName</strong></div>
+    </div>
+    <div class="info-card">
+        <span class="info-icon grey"><i class="bi bi-phone"></i></span>
+        <div>
+            <span class="info-label">App account</span>
+            <strong>@(t.HasSignedUp ? "Linked" : "Not signed up")</strong>
+        </div>
+    </div>
+    <div class="info-card">
+        <span class="info-icon red"><i class="bi bi-tools"></i></span>
+        <div>
+            <span class="info-label">Open requests</span>
+            <strong>@Model.OpenRequests</strong>
+            <span class="info-sub">@Model.Requests.Count in total</span>
+        </div>
+    </div>
+</div>
+
+<div class="room-grid">
+
+    <!-- ================= Contact & contract ================= -->
+    <div class="card">
+        <h3 class="card-title">Contact &amp; contract</h3>
+        <div style="margin-top:14px">
+            <div class="field"><span class="field-label">Email</span><p>@(Model.Student?.Email ?? t.Email ?? "-")</p></div>
+            <div class="field"><span class="field-label">Phone</span><p>@(Model.Student?.Phone ?? t.Phone ?? "-")</p></div>
+            <div class="field"><span class="field-label">Contract added</span><p>@Ui.Local(t.CreatedAt).ToString("d MMM yyyy")</p></div>
+            <div class="field">
+                <span class="field-label">Signed up in the app</span>
+                <p>@(Model.Student?.RegisteredAt is DateTimeOffset reg ? Ui.Local(reg).ToString("d MMM yyyy") : "Not yet")</p>
+            </div>
+        </div>
+
+        @if (!t.HasSignedUp)
+        {
+            <p class="locked-note">
+                <i class="bi bi-info-circle"></i>
+                When this student signs up in the app with student number @t.StudentNumber and surname
+                @t.Surname, they're linked to room @t.Room?.RoomNumber automatically.
+            </p>
+        }
+
+        <!-- Moving out -->
+        <div class="danger-zone">
+            <strong>End tenancy</strong>
+            <p>
+                Use this when the student moves out. The bed becomes free and they can no longer report
+                problems for this room. Their past requests are kept.
+            </p>
+            <form asp-action="EndTenancy" asp-route-id="@t.Id" method="post"
+                  onsubmit="return confirm('End @t.FullName\'s tenancy in room @t.Room?.RoomNumber?');">
+                <button type="submit" class="btn btn-danger-outline">
+                    <i class="bi bi-box-arrow-right"></i> End tenancy
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= Their requests ================= -->
+    <div class="card">
+        <h3 class="card-title">Maintenance requests</h3>
+        <p class="card-subtitle">Problems this student has reported</p>
+
+        @if (!t.HasSignedUp)
+        {
+            <div class="empty">Not signed up in the app yet</div>
+        }
+        else if (Model.Requests.Count == 0)
+        {
+            <div class="empty">No requests yet</div>
+        }
+        else
+        {
+            <div class="table-wrap" style="margin-top:14px">
+                <table class="table">
+                    <thead>
+                        <tr><th>#</th><th>Issue</th><th>Room</th><th>Priority</th><th>Status</th><th>Date</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in Model.Requests)
+                        {
+                            var url = Url.Action("Details", "Requests", new { id = r.Id });
+                            <tr class="clickable" onclick="location.href='@url'">
+                                <td class="muted small-text">@r.Reference</td>
+                                <td><a href="@url" class="cell-main">@r.Title</a></td>
+                                <td>@r.Room?.RoomNumber</td>
+                                <td><span class="chip @RequestPriority.Css(r.Priority)">@r.Priority</span></td>
+                                <td><span class="chip @RequestStatus.Css(r.Status)">@RequestStatus.Label(r.Status)</span></td>
+                                <td class="muted small-text">@Ui.Local(r.DateSubmitted).ToString("d MMM yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
