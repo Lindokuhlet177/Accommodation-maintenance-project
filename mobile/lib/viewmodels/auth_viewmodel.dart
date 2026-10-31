@@ -10,7 +10,7 @@ class AuthViewModel extends ChangeNotifier {
   final AuthService _authService;
 
   AuthViewModel({AuthService? authService})
-      : _authService = authService ?? AuthService();
+    : _authService = authService ?? AuthService();
 
   // ---------- State the screens read ----------
 
@@ -25,10 +25,7 @@ class AuthViewModel extends ChangeNotifier {
   // ---------- Actions the screens call ----------
 
   /// Returns true if login worked.
-  Future<bool> login({
-    required String email,
-    required String password,
-  }) async {
+  Future<bool> login({required String email, required String password}) async {
     _startLoading();
     try {
       await _authService.signIn(email: email, password: password);
@@ -45,7 +42,7 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   /// Returns what happened, or null if sign-up failed.
-   Future<SignUpResult?> signUp({
+  Future<SignUpResult?> signUp({
     required String name,
     required String surname,
     required String studentNumber,
@@ -116,7 +113,7 @@ class AuthViewModel extends ChangeNotifier {
       case 'over_email_send_rate_limit':
       case 'over_request_rate_limit':
         return 'Too many attempts. Please wait a minute and try again.';
-           default:
+      default:
         // The database refuses a student number that's already registered
         if (e.message.contains('Database error saving new user')) {
           return 'This student number is already registered. '

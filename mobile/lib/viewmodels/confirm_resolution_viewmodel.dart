@@ -10,7 +10,7 @@ class ConfirmResolutionViewModel extends ChangeNotifier {
   final RequestService _requestService;
 
   ConfirmResolutionViewModel({RequestService? requestService})
-      : _requestService = requestService ?? RequestService();
+    : _requestService = requestService ?? RequestService();
 
   // ---------- State the screen reads ----------
 

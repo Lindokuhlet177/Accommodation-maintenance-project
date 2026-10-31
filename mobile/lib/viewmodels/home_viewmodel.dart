@@ -13,8 +13,8 @@ class HomeViewModel extends ChangeNotifier {
   HomeViewModel({
     StudentService? studentService,
     RequestService? requestService,
-  })  : _studentService = studentService ?? StudentService(),
-        _requestService = requestService ?? RequestService();
+  }) : _studentService = studentService ?? StudentService(),
+       _requestService = requestService ?? RequestService();
 
   // ---------- State the screen reads ----------
 

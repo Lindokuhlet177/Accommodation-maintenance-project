@@ -8,11 +8,9 @@ class ProfileViewModel extends ChangeNotifier {
   final StudentService _studentService;
   final AuthService _authService;
 
-  ProfileViewModel({
-    StudentService? studentService,
-    AuthService? authService,
-  })  : _studentService = studentService ?? StudentService(),
-        _authService = authService ?? AuthService();
+  ProfileViewModel({StudentService? studentService, AuthService? authService})
+    : _studentService = studentService ?? StudentService(),
+      _authService = authService ?? AuthService();
 
   // ---------- State the screens read ----------
 
@@ -36,8 +34,9 @@ class ProfileViewModel extends ChangeNotifier {
 
   String get studentNumberLabel {
     final number = _student?.studentNumber;
-    return number == null ? 'Student Number: not added yet'
-                          : 'Student Number: $number';
+    return number == null
+        ? 'Student Number: not added yet'
+        : 'Student Number: $number';
   }
 
   String get accommodationName =>
