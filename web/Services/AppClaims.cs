@@ -1,67 +1,45 @@
-﻿using System.Security.Claims;
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../models/student.dart';
 
-namespace StudentStayFix.Web.Services;
+/// Reads and updates the logged-in student's own record.
+class StudentService {
+  final SupabaseClient _client;
 
-/// <summary>
-/// What we store in the login cookie, and easy ways to read it back.
-/// </summary>
-public static class AppClaims
-{
-    // Extra values kept in the cookie (besides id, name, email, role)
-    public const string AccessToken = "sb_access_token";
-    public const string RefreshToken = "sb_refresh_token";
-    public const string ExpiresAt = "sb_expires_at";
-    public const string AccommodationId = "accommodation_id";
-    public const string AvatarPath = "avatar_path";
+  StudentService({SupabaseClient? client})
+      : _client = client ?? Supabase.instance.client;
 
-    // ---------- Reading the logged-in user ----------
+  /// Loads the logged-in student with their room and accommodation.
+  /// Returns null if nobody is logged in or no student row exists.
+  Future<Student?> getCurrentStudent() async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) return null;
 
-    public static string UserId(this ClaimsPrincipal user) =>
-        user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+    final data = await _client
+        .from('student')
+        .select('*, room(*, accommodation(*))')
+        .eq('id', userId)
+        .maybeSingle();
 
-    public static string FullName(this ClaimsPrincipal user) =>
-        user.FindFirst(ClaimTypes.Name)?.Value ?? "";
+    return data == null ? null : Student.fromJson(data);
+  }
 
-    public static string FirstName(this ClaimsPrincipal user) =>
-        user.FullName().Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "";
-
-    public static string RoleName(this ClaimsPrincipal user) =>
-        user.FindFirst(ClaimTypes.Role)?.Value ?? "";
-
-    public static bool IsLandlord(this ClaimsPrincipal user) => user.IsInRole("Landlord");
-
-    /// <summary>Caretaker: their building. Landlord: null (sees all).</summary>
-    public static long? StaffAccommodationId(this ClaimsPrincipal user) =>
-        long.TryParse(user.FindFirst(AccommodationId)?.Value, out var id) ? id : null;
-
-    public static string? AvatarPathOf(this ClaimsPrincipal user)
-    {
-        var v = user.FindFirst(AvatarPath)?.Value;
-        return string.IsNullOrWhiteSpace(v) ? null : v;
-    }
-
-    public static string Initials(string name)
-    {
-        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length == 0) return "?";
-        if (parts.Length == 1) return parts[0][..1].ToUpper();
-        return (parts[0][..1] + parts[^1][..1]).ToUpper();
-    }
-
-    // ---------- Building the cookie at login ----------
-
-    public static List<Claim> Build(
-    string userId, string name, string email, string role,
-    long? accommodationId, string? avatarPath, AuthSession session) =>
-[
-    new(ClaimTypes.NameIdentifier, userId),
-        new(ClaimTypes.Name, name),
-        new(ClaimTypes.Email, email),
-        new(ClaimTypes.Role, role),
-        new(AccommodationId, accommodationId?.ToString() ?? ""),
-        new(AvatarPath, avatarPath ?? ""),
-        new(AccessToken, session.AccessToken),
-        new(RefreshToken, session.RefreshToken),
-        new(ExpiresAt, session.ExpiresAt.ToString())
-];
+  /// Edit Profile: saves name, surname and phone only.
+  Future<void> updateProfile(Student student) async {
+    await _client
+        .from('student')
+        .update(student.toUpdateJson())
+        .eq('id', student.id);
+  }
+    /// "Try again": saves the corrected student number and surname, then
+  /// re-runs the contract matching (Step W13.1). Returns true if linked.
+  Future<bool> retryContractMatch({
+    required String studentNumber,
+    required String surname,
+  }) async {
+    final result = await _client.rpc('retry_contract_match', params: {
+      'p_student_number': studentNumber.trim().toUpperCase(),
+      'p_surname': surname.trim(),
+    });
+    return result == true;
+  }
 }
