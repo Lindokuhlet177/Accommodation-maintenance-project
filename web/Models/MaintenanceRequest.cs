@@ -1,4 +1,4 @@
-﻿namespace StudentStayFix.Web.Models;
+﻿﻿namespace StudentStayFix.Web.Models;
 
 /// <summary>Mirrors the maintenance_request table (+ the student and room joined in).</summary>
 public class MaintenanceRequest
