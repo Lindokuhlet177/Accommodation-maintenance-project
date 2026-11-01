@@ -80,7 +80,7 @@ public class ResidentsController : AppController
         {
             TempData["Error"] = "Could not load tenants: " + ex.Message;
         }
-        // Number of unmatched sign-ups, for the "Registration requests" button
+        // Number of unmatched sign-ups, for the "Registration requests" button.
         try
         {
             var pending = await Db.GetAsync<PendingStudent>(
@@ -89,7 +89,7 @@ public class ResidentsController : AppController
         }
         catch (SupabaseException) { ViewData["PendingCount"] = 0; }
 
-        // Caretakers waiting for approval, for the "Caretakers" button
+        // Caretakers waiting for approval, for the "Caretakers" button.
         try
         {
             var waiting = await Db.GetAsync<Staff>("staff?select=id&role=eq.Caretaker&is_approved=eq.false");
@@ -110,7 +110,7 @@ public class ResidentsController : AppController
         var form = new TenantForm();
         await LoadRoomChoicesAsync(form);
 
-        // Coming from a room page ("+ Add tenant"): pre-select that room if it has space
+        // Coming from a room page ("+ Add tenant"): pre-select that room if it has space.
         if (roomId != null && form.RoomChoices.Any(r => r.Room.Id == roomId && !r.IsOccupied))
             form.RoomId = roomId;
 
@@ -125,7 +125,7 @@ public class ResidentsController : AppController
         SetCreateTitles();
         await LoadRoomChoicesAsync(form);
 
-        // The room must belong to the property being viewed
+        // The room must belong to the property being viewed.
         if (form.RoomId != null && form.RoomChoices.All(r => r.Room.Id != form.RoomId))
             ModelState.AddModelError(nameof(form.RoomId), "Choose a room in this property");
 
@@ -134,7 +134,7 @@ public class ResidentsController : AppController
         try
         {
             // add_tenancy (Step W1c): landlord check, capacity, duplicates,
-            // and links a student who already signed up with these details
+            // and links a student who already signed up with these details.
             var tenancyId = await Db.RpcAsync<long>("add_tenancy", new
             {
                 p_room_id = form.RoomId,
@@ -175,7 +175,7 @@ public class ResidentsController : AppController
                 .FirstOrDefault(p => p.Id == tenancy.Room?.AccommodationId)?.Name ?? ""
         };
 
-        // Signed up in the app? Load their account and their requests
+        // Signed up in the app? Load their account and their requests.
         if (tenancy.StudentId is Guid studentId)
         {
             var studentTask = Db.GetOneAsync<RequestStudent>(
@@ -209,7 +209,7 @@ public class ResidentsController : AppController
         try
         {
             // end_tenancy (Step W1c): removes the contract and the room link,
-            // keeps the student's past requests
+            // keeps the student's past requests.
             await Db.RpcAsync("end_tenancy", new { p_tenancy_id = id });
             TempData["Success"] = $"{tenancy.FullName}'s tenancy in room {tenancy.Room?.RoomNumber} has ended.";
             return RedirectToAction(nameof(Index));
@@ -236,7 +236,7 @@ public class ResidentsController : AppController
                 "student?select=id,name,surname,student_number,email,registered_at" +
                 "&registration_status=eq.pending&room_id=is.null&order=registered_at.desc");
 
-            // Rooms with a free bed, in every property, for the dropdown
+            // Rooms with a free bed, in every property, for the dropdown.
             var ids = SupabaseDb.In(Shell.Properties.Select(p => p.Id));
             var rooms = Shell.Properties.Count == 0 ? [] :
                 await Db.GetAsync<Room>($"room?select=*&accommodation_id={ids}");
@@ -273,7 +273,7 @@ public class ResidentsController : AppController
 
         try
         {
-            // No student number yet? Save the one the landlord typed first
+            // No student number yet? Save the one the landlord typed first.
             if (!string.IsNullOrWhiteSpace(studentNumber))
             {
                 await Db.RpcAsync("set_student_number", new
