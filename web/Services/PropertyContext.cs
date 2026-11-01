@@ -73,7 +73,7 @@ public class PropertyContext
                 $"accommodation?select=id,name,address&id=eq.{id}");
             shell.Current = shell.Properties.FirstOrDefault();
         }
-        // Bell: unread count (not critical, so a failure just shows no badge)
+        // Bell: unread count (not critical, so a failure just shows no badge).
         try
         {
             shell.UnreadCount = await _db.RpcAsync<int>("staff_unread_notifications");
