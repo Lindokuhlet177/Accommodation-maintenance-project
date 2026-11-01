@@ -1,4 +1,4 @@
-﻿namespace StudentStayFix.Web.Models;
+﻿﻿namespace StudentStayFix.Web.Models;
 
 /// <summary>Mirrors status_history: one timeline entry.</summary>
 public class StatusHistoryEntry
