@@ -15,7 +15,7 @@ public class DashboardController : AppController
         ViewData["Active"] = "Overview";
         ViewData["Heading"] = $"{Ui.Greeting}, {User.FirstName()}";
 
-        // No property yet (new landlord): the page shows "Add your first property"
+        // No property yet (new landlord): the page shows "Add your first property".
         if (CurrentAccommodationId is not long accId)
             return View(new DashboardViewModel { CanManageTasks = Shell.IsLandlord });
 
@@ -32,7 +32,7 @@ public class DashboardController : AppController
             $"upcoming_task?select=*&accommodation_id=eq.{accId}" +
             $"&event_date=gte.{from}&order=event_date.asc&limit=5";
 
-        // Run both at the same time
+        // Run both at the same time.
         var requestsTask = Db.GetAsync<MaintenanceRequest>(requestsQuery);
         var tasksTask = Db.GetAsync<UpcomingTask>(tasksQuery);
 
