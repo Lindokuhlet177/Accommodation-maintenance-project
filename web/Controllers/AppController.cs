@@ -54,8 +54,8 @@ public abstract class AppController : Controller
     /// <summary>Replaces one value in the login cookie (e.g. new name or photo).</summary>
     protected async Task UpdateCookieClaimAsync(string type, string? value)
     {
-        var claims = User.Claims.Where(c => c.Type != type).ToList();
-        claims.Add(new Claim(type, value ?? ""));
+        var claims = User.Claims.Where(c => c.Type != type).ToList(); 
+        claims.Add(new Claim(type, value ?? "")); 
 
         var principal = new ClaimsPrincipal(
             new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
